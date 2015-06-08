@@ -32,7 +32,7 @@ L.Map.TouchZoom = L.Handler.extend({
 		this._moved = false;
 		this._zooming = true;
 
-		map.stop();
+		map._stop();
 
 		L.DomEvent
 		    .on(document, 'touchmove', this._onTouchMove, this)

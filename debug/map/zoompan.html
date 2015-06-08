@@ -50,7 +50,12 @@
 			dc = [38.91, -77.04],
 			trd = [63.41, 10.41];
 
-		var map = L.map('map').setView(dc, 10);
+		var map = L.map('map',{
+			snapZoom: 0.25,
+			doubleClickZoomOffset: 0.5,
+			scrollWheelZoomOffset: 0.25,
+			keyboardZoomOffset: 0.75
+		}).setView(dc, 10);
 
 		var tiles = L.tileLayer('http://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
 			attribution: '<a href="https://www.mapbox.com/about/maps/">Terms and Feedback</a>',

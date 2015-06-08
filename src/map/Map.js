@@ -16,7 +16,8 @@ L.Map = L.Evented.extend({
 		fadeAnimation: true,
 		trackResize: true,
 		markerZoomAnimation: true,
-		maxBoundsViscosity: 0.0
+		maxBoundsViscosity: 0.0,
+		snapZoom: 0
 	},
 
 	initialize: function (id, options) { // (HTMLElement or String, Object)
@@ -32,6 +33,12 @@ L.Map = L.Evented.extend({
 
 		if (options.maxBounds) {
 			this.setMaxBounds(options.maxBounds);
+		}
+
+		if (options.snapZoom) {
+			if (!(options.snapZoom instanceof Function)) {
+				this.options.snapZoom = this._snapZoom(options.snapZoom);
+			}
 		}
 
 		if (options.zoom !== undefined) {
@@ -227,11 +234,8 @@ L.Map = L.Evented.extend({
 	},
 
 	stop: function () {
-		L.Util.cancelAnimFrame(this._flyToFrame);
-		if (this._panAnim) {
-			this._panAnim.stop();
-		}
-		return this;
+		this.setZoom(this._limitZoom(this._zoom));
+		return this._stop();
 	},
 
 	// TODO handler.addTo
@@ -577,6 +581,14 @@ L.Map = L.Evented.extend({
 		return this.fire('moveend');
 	},
 
+	_stop: function() {
+		L.Util.cancelAnimFrame(this._flyToFrame);
+		if (this._panAnim) {
+			this._panAnim.stop();
+		}
+		return this;
+	},
+
 	_rawPanBy: function (offset) {
 		L.DomUtil.setPosition(this._mapPane, this._getMapPanePos().subtract(offset));
 	},
@@ -781,11 +793,19 @@ L.Map = L.Evented.extend({
 	},
 
 	_limitZoom: function (zoom) {
+		console.log('_limitZoom', zoom);
 		var min = this.getMinZoom(),
 		    max = this.getMaxZoom();
 		if (!L.Browser.any3d) { zoom = Math.round(zoom); }
+		else if (this.options.snapZoom) { zoom = this.options.snapZoom(zoom); }
 
 		return Math.max(min, Math.min(max, zoom));
+	},
+
+	_snapZoom: function(snap) {
+		return function(zoom) {
+			return Math.round(zoom / snap) * snap;
+		}
 	}
 });
 
