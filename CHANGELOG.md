@@ -1124,4 +1124,3 @@ Icon API was improved to be more flexible, but one of the changes is backwards-i
 ## 0.1 (2011-05-13)
 
 Initial Leaflet release.
-test
